@@ -2,11 +2,21 @@
 require 'vendor/autoload.php';
 
 $string = 'sqlite:notes.db';
-
 $action = mof\input('action');
+$id = mof\input('id');
+
+class Note extends Model {
+   protected $fields = array('id', 'date', 'title', 'detail');
+   protected $table = 'notes';
+   protected $key = 'id';
+
+   public function all() {
+      $query = $this->query("select * from {$this->table} order by date desc");
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+   }
+}
 
 $note = new Note();
-$id = mof\input('id');
 
 switch ($action) {
    case 'save':
@@ -58,7 +68,7 @@ switch ($action) {
          }
 
          code {
-            white-space: normal;
+            white-space: pre-wrap;
             word-wrap: break-word;
          }
       </style>
@@ -300,6 +310,8 @@ switch ($action) {
             $scope.note = function(id) {
                if (!id) {
                   id = $scope.data.id;
+               } else {
+                  $scope.data.id = id;
                }
                return $scope.notes.find(function(each) {
                   return each.id == id;
@@ -362,7 +374,6 @@ switch ($action) {
                var note = $scope.note(id);
                var converter = new showdown.Converter();
                var html = converter.makeHtml(note.detail);
-               $scope.data.id = id;
                $scope.filter = false;
                $scope.detail = $sce.trustAsHtml(html);
                $scope.page = 'view';
