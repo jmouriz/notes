@@ -5,7 +5,7 @@ $string = 'sqlite:notes.db';
 $action = mof\input('action');
 $id = mof\input('id');
 
-class Note extends Model {
+class Note extends ORM\Model {
    protected $fields = array('id', 'date', 'title', 'detail');
    protected $table = 'notes';
    protected $key = 'id';
