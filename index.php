@@ -1,115 +1,25 @@
 <?php
 require 'vendor/autoload.php';
 
-class Model {
-   protected $fields = array();
-   protected $connection;
-   protected $table;
-   protected $data;
-   protected $key;
+$string = 'sqlite:notes.db';
 
-   public function __construct() {
-      $options = array(
-         PDO::ATTR_PERSISTENT => true,
-         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-      );
-      $this->connection = new PDO('sqlite:notes.db', null, null, $options);
-      $this->data = (object) array();
-   }
-
-   public function __destruct() {
-      $this->connection = null;
-   }
-
-   public function __set($key, $value) {
-      if (in_array($key, $this->fields)) {
-         $this->data->$key = $value;
-      }
-   }
-
-   public function __get($key) {
-      if (property_exists($this->data, $key)) {
-         return $this->data->$key;
-      }
-   }
-
-   protected function query($sql) {
-      $query = $this->connection->prepare($sql);
-      foreach ($this->data as $key => $value) {
-         if (preg_match("/:$key/", $sql)) {
-            $query->bindValue(":$key", $value);
-         }
-      }
-      $query->execute();
-      return $query;
-   }
-
-   public function get() {
-      return $this->data;
-   }
-
-   public function key($value) {
-      $key = $this->key;
-      $this->$key = $value;
-   }
-
-   public function all() {
-      $query = $this->query("select * from {$this->table}");
-      return $query->fetchAll(PDO::FETCH_ASSOC);
-   }
-
-   public function select($key) {
-      $this->key($key);
-      $query = $this->query("select * from {$this->table} where {$this->key} = :{$this->key}");
-      $data = $query->fetch(PDO::FETCH_OBJ);
-      if ($data) {
-         $this->data = $data;
-      }
-      return $data;
-   }
-
-   public function insert() {
-      $fields = implode(',', $this->fields);
-      $values = implode(',', array_map(function ($field) {
-         return ":$field";
-      }, $this->fields));
-      $this->query("insert into {$this->table} ($fields) values ($values)");
-      $this->key($this->connection->lastInsertId());
-   }
-
-   public function delete($key) {
-      $this->key($key);
-      $this->query("delete from {$this->table} where {$this->key} = :{$this->key}");
-   }
-}
-
-class Note extends Model {
-   protected $fields = array('id', 'date', 'title', 'detail');
-   protected $table = 'notes';
-   protected $key = 'id';
-
-}
+$action = mof\input('action');
 
 $note = new Note();
-$action = mof\input('action');
+$id = mof\input('id');
+
 switch ($action) {
    case 'save':
-      $id = mof\input('id');
-      if ($id) {
-         $note->delete($id);
-         $status = 'updated';
-      } else {
-         $status = 'inserted';
-      }
       $detail = mof\input('detail');
+      $note->id = $id;
       $note->title = trim(strtok($detail, "\n"), "#*- \t\n\r\0\x0B");
       $note->detail = $detail;
       $note->date = date('U') * 1000;
-      $note->insert();
-      mof\json(array('status' => $status, 'note' => $note->get()));
+      $note->save();
+      mof\json(array('status' => $id ? 'updated' : 'inserted', 'note' => $note->get()));
    case 'delete':
-      $id = mof\input('id');
-      $note->delete($id);
+      $note->id = $id;
+      $note->delete();
       mof\json(array('status' => 'ok'));
 }
 ?>
@@ -313,7 +223,7 @@ switch ($action) {
       </div>
       
       <md-content layout="vertical" style="height: calc(100% - 48px)" flex>
-         <md-content layout="vertical" style="{{page == 'edit' ? 'height: 100%' : 'display: block'}}" flex>
+         <md-content layout="vertical" style="{{page == 'edit' ? 'height: calc(100% - 8px)' : 'display: block'}}" flex>
             <md-card flex>
                <md-card-content style="height: 100%" ng-switch="page">
                   <md-list flex ng-switch-when="list">

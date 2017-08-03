@@ -19,9 +19,9 @@ Notes es un pequeño cuaderno de apuntes escrito en PHP que usa SQLite como base
 ## Instalación
 
 ```
-bower install
-composer install
-sqlite3 notes.db
+$ bower install
+$ composer install
+$ sqlite3 notes.db
 sql> create table notes (
 ...>   id integer primary key,
 ...>   date timestamp,
@@ -29,6 +29,6 @@ sql> create table notes (
 ...>   detail text
 ...>);
 sql> .quit
-chmod g+w notes.db
-chgrp www-data notes.db
+$ chmod g+w notes.db
+$ chgrp www-data notes.db
 ```
