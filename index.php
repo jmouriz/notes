@@ -3,10 +3,12 @@ require 'vendor/autoload.php';
 
 $string = 'sqlite:notes.db';
 $action = mof\input('action');
-$id = mof\input('id');
+$id = mof\input('id', null);
+
+ORM\connect($string);
 
 class Note extends ORM\Model {
-   protected $fields = array('id', 'date', 'title', 'detail');
+   protected $columns = array('id', 'date', 'title', 'detail');
    protected $table = 'notes';
    protected $key = 'id';
 
@@ -17,18 +19,17 @@ class Note extends ORM\Model {
 }
 
 $note = new Note();
+$note->key($id);
 
 switch ($action) {
    case 'save':
       $detail = mof\input('detail');
-      $note->id = $id;
       $note->title = trim(strtok($detail, "\n"), "#*- \t\n\r\0\x0B");
       $note->detail = $detail;
       $note->date = date('U') * 1000;
       $note->save();
       mof\json(array('status' => $id ? 'updated' : 'inserted', 'note' => $note->get()));
    case 'delete':
-      $note->id = $id;
       $note->delete();
       mof\json(array('status' => 'ok'));
 }
