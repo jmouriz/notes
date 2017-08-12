@@ -1,6 +1,6 @@
 # Notes
 
-Notes es un pequeño cuaderno de apuntes escrito en PHP que usa SQLite como base de datos. Es más bien un ejemplo de una aplicación AngularJS con diseño de materiales, sensible al dispositivo (responsive) aunque por estar escrita en PHP no es del todo híbrida. La idea principal es que toda la aplicación se encuentre en un sólo archivo.
+Notes es un pequeño cuaderno de apuntes escrito en PHP que usa SQLite como base de datos. Es más bien un ejemplo de cómo usar [Omicron](https://packagist.org/packages/jmouriz/omicron) (un Micro-ORM para PHP) aunque también sirve como ejemplo de cómo hacer una aplicación AngularJS con diseño de materiales, sensible al dispositivo (responsive) si bien por estar escrita en PHP no es del todo híbrida como lo es [h-notes](https://github.com/jmouriz/h-notes). La idea principal es que toda la aplicación se encuentre en un sólo archivo SDL (Single Document Layout).
 
 # Capturas de pantalla
 
